@@ -31,7 +31,7 @@ resource "aws_internet_gateway" "gw" {
 
 # Route the public subnet traffic through the IGW
 resource "aws_route" "internet_access" {
-  route_table_id         = aws_vpc.main.main_route_table_id
+  route_table_id         = aws_vpc.my_vpc.main_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.gw.id
 }
@@ -52,7 +52,7 @@ resource "aws_nat_gateway" "gw" {
 # Create a new route table for the private subnets, make it route non-local traffic through the NAT gateway to the internet
 resource "aws_route_table" "private" {
   count  = var.az_count
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.my_vpc.id
 
   route {
     cidr_block     = "0.0.0.0/0"
