@@ -3,9 +3,10 @@ provider "aws" {
 }
 
 #tfsec:ignore:aws-s3-enable-bucket-logging
-resource "aws_s3_bucket" "example" {
-  bucket = "hacka-thon-2025"
+module "jhooq-webserver-1" {
+  source = ".//vpc"
 }
+
 
 # resource "aws_s3_bucket_ownership_controls" "example" {
 #   bucket = aws_s3_bucket.example.id
