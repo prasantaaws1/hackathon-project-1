@@ -18,6 +18,7 @@ module "vpc" {
   source      = "./modules/network"
   vpc_cidr    = var.vpc_cidr
   subnet_cidr = var.subnet_cidr
+  # az_count    = "1"
 }
 
 module "ecs_app" {
