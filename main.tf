@@ -3,9 +3,9 @@ provider "aws" {
 }
 
 #tfsec:ignore:aws-s3-enable-bucket-logging
-module "jhooq-webserver-1" {
+module "hackathon-network" {
   source   = ".//modules/vpc"
-  az_count = "2"
+  az_count = "3"
 }
 
 

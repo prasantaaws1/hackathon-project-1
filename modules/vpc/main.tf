@@ -2,6 +2,11 @@ resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cider
   instance_tenancy     = "default"
   enable_dns_hostnames = true
+
+  tags = {
+    Name = "project-vpc"
+  }
+
 }
 
 resource "aws_subnet" "private" {
@@ -9,6 +14,11 @@ resource "aws_subnet" "private" {
   cidr_block = cidrsubnet(aws_vpc.vpc.cidr_block, 8, count.index)
   # availability_zone = data.aws_availability_zones.available.names[count.index]
   vpc_id = aws_vpc.vpc.id
+
+  tags = {
+    Name = "Private-subnet"
+  }
+
 }
 
 # Create var.az_count public subnets, each in a different AZ
@@ -18,86 +28,57 @@ resource "aws_subnet" "public" {
   # availability_zone       = data.aws_availability_zones.available.names[count.index]
   vpc_id                  = aws_vpc.vpc.id
   map_public_ip_on_launch = true
+
+  tags = {
+    Name = "Public-subnet"
+  }
+
 }
 
-# resource "aws_subnet" "sn1" {
-#   cidr_block              = "10.0.1.0/24"
-#   vpc_id                  = aws_vpc.vpc.id
-#   availability_zone       = "us-east-2a"
-#   map_public_ip_on_launch = true
-# }
+# Internet Gateway for the public subnet
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.vpc.id
 
-# resource "aws_subnet" "sn2" {
-#   cidr_block              = "10.0.2.0/24"
-#   vpc_id                  = aws_vpc.vpc.id
-#   availability_zone       = "us-east-2b"
-#   map_public_ip_on_launch = true
-# }
+  tags = {
+    Name = "IGW"
+  }
 
-# resource "aws_subnet" "sn3" {
-#   cidr_block              = "10.0.3.0/24"
-#   vpc_id                  = aws_vpc.vpc.id
-#   availability_zone       = "us-east-2c"
-#   map_public_ip_on_launch = true
-# }
+}
 
-# resource "aws_security_group" "sg" {
-#   name   = "sg"
-#   vpc_id = aws_vpc.vpc.id
+# Route the public subnet traffic through the IGW
+resource "aws_route" "internet_access" {
+  route_table_id         = aws_vpc.vpc.main_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gw.id
+}
 
-#   ingress {
-#     description = "https"
-#     from_port   = 443
-#     to_port     = 443
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+# Create a NAT gateway with an Elastic IP for each private subnet to get internet connectivity
+resource "aws_eip" "gw" {
+  count      = var.az_count
+  domain     = "vpc"
+  depends_on = [aws_internet_gateway.gw]
+}
 
-#   ingress {
-#     description = "http"
-#     from_port   = 80
-#     to_port     = 80
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+resource "aws_nat_gateway" "gw" {
+  count         = var.az_count
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
+  allocation_id = element(aws_eip.gw.*.id, count.index)
+}
 
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
+# Create a new route table for the private subnets, make it route non-local traffic through the NAT gateway to the internet
+resource "aws_route_table" "private" {
+  count  = var.az_count
+  vpc_id = aws_vpc.vpc.id
 
-# resource "aws_internet_gateway" "gw" {
-#   vpc_id = aws_vpc.vpc.id
-# }
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = element(aws_nat_gateway.gw.*.id, count.index)
+  }
+}
 
-# resource "aws_route_table" "rt" {
-#   vpc_id = aws_vpc.vpc.id
-
-#   route {
-#     cidr_block = "0.0.0.0/0"
-#     gateway_id = aws_internet_gateway.gw.id
-#   }
-
-#   route {
-#     ipv6_cidr_block = "::/0"
-#     gateway_id      = aws_internet_gateway.gw.id
-#   }
-# }
-
-# resource "aws_route_table_association" "route1" {
-#   route_table_id = aws_route_table.rt.id
-#   subnet_id      = aws_subnet.sn1.id
-# }
-
-# resource "aws_route_table_association" "route2" {
-#   route_table_id = aws_route_table.rt.id
-#   subnet_id      = aws_subnet.sn2.id
-# }
-
-# resource "aws_route_table_association" "route3" {
-#   route_table_id = aws_route_table.rt.id
-#   subnet_id      = aws_subnet.sn3.id
-# }
+# Explicitly associate the newly created route tables to the private subnets (so they don't default to the main route table)
+resource "aws_route_table_association" "private" {
+  count          = var.az_count
+  subnet_id      = element(aws_subnet.private.*.id, count.index)
+  route_table_id = element(aws_route_table.private.*.id, count.index)
+}
