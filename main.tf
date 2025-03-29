@@ -5,18 +5,19 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket         = "hacka-thon-mar-2025"
-    dynamodb_table = "state-lock"
+    bucket         = "hacka-thon-mar-2025-1"
+    dynamodb_table = "state-lock-1"
     key            = "global/mystatefile/terraform.tfstate"
     region         = "ap-south-1"
     encrypt        = true
   }
 }
 
-#tfsec:ignore:aws-s3-enable-bucket-logging
-module "hackathon-network" {
-  source   = ".//modules/vpc"
-  az_count = "3"
+
+module "vpc" {
+  source      = "./modules/network"
+  vpc_cidr    = var.vpc_cidr
+  subnet_cidr = var.subnet_cidr
 }
 
 
