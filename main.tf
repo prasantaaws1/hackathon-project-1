@@ -14,7 +14,7 @@ terraform {
 }
 
 
-module "vpc" {
+module "network" {
   source      = "./modules/network"
   vpc_cidr    = var.vpc_cidr
   subnet_cidr = var.subnet_cidr
@@ -42,7 +42,7 @@ module "vpc" {
 module "security" {
   source   = "./modules/security"
   app_port = 80
-  vpc_id   = module.network.id
+  vpc_id   = module.network.vpc_id
 }
 
 # resource "aws_s3_bucket_ownership_controls" "example" {
