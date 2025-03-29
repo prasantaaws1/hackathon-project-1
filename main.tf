@@ -7,7 +7,7 @@ terraform {
   backend "s3" {
     bucket         = "hacka-thon-mar-2025-1"
     dynamodb_table = "state-lock-1"
-    key            = "global/mystatefile/terraform.tfstate"
+    key            = "global/mystatefile-1/terraform.tfstate"
     region         = "ap-south-1"
     encrypt        = true
   }
