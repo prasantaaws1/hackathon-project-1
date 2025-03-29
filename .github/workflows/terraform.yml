@@ -38,5 +38,6 @@ jobs:
 
       - name: Initialize Terraform
         run: terraform init
+        
       - name: Plan Terraform changes
         run: terraform plan -out=tfplan
