@@ -42,7 +42,7 @@ module "vpc" {
 module "security" {
   source   = "./modules/security"
   app_port = 80
-  vpc_id   = module.network.vpc_id
+  vpc_id   = module.network.id
 }
 
 # resource "aws_s3_bucket_ownership_controls" "example" {
