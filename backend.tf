@@ -9,6 +9,11 @@ resource "aws_s3_bucket" "mybucket" {
 resource "aws_dynamodb_table" "statelock" {
   name     = "state-lock"
   hash_key = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
 }
 
 
