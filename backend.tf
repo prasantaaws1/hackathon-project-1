@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket  = "hacka-thon.pk.29.03.2025"
+    bucket  = "hacka-thon-2025"
     region  = "ap-south-1"
     key     = "s3-github-actions/terraform.tfstate"
     encrypt = true

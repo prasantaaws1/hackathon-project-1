@@ -4,7 +4,7 @@ provider "aws" {
 
 #tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "example" {
-  bucket = "hacka-thon.pk.29.03.2025"
+  bucket = "hacka-thon-2025"
 }
 
 # resource "aws_s3_bucket_ownership_controls" "example" {
