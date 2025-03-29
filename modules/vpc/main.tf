@@ -4,7 +4,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "project-vpc"
+    Name = "project"
   }
 
 }
@@ -16,7 +16,7 @@ resource "aws_subnet" "private" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "Private-subnet"
+    Name = "Private"
   }
 
 }
@@ -30,7 +30,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "Public-subnet"
+    Name = "Public"
   }
 
 }
@@ -40,7 +40,7 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "IGW"
+    Name = "Project-IGW"
   }
 
 }
