@@ -2,6 +2,17 @@ provider "aws" {
   region = var.aws_region
 }
 
+
+terraform {
+  backend "s3" {
+    bucket         = "hacka-thon-mar-2025"
+    dynamodb_table = "state-lock"
+    key            = "global/mystatefile/terraform.tfstate"
+    region         = var.aws_region
+    encrypt        = true
+  }
+}
+
 #tfsec:ignore:aws-s3-enable-bucket-logging
 module "hackathon-network" {
   source   = ".//modules/vpc"
