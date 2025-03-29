@@ -8,7 +8,7 @@ terraform {
     bucket         = "hacka-thon-mar-2025"
     dynamodb_table = "state-lock"
     key            = "global/mystatefile/terraform.tfstate"
-    region         = var.aws_region
+    region         = "ap-south-1"
     encrypt        = true
   }
 }
