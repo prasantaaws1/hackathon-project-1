@@ -13,3 +13,7 @@ variable "subnet_names" {
   type        = list(string)
   default     = ["PublicSubnet1", "PublicSubnet2"]
 }
+
+variable "az_count" {
+  description = "Number of availability zones"
+}
