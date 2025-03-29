@@ -26,7 +26,7 @@ resource "aws_subnet" "public" {
 
 # Internet Gateway for the public subnet
 resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.my_vpc.id
 }
 
 # Route the public subnet traffic through the IGW
