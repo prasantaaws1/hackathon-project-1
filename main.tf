@@ -4,7 +4,8 @@ provider "aws" {
 
 #tfsec:ignore:aws-s3-enable-bucket-logging
 module "jhooq-webserver-1" {
-  source = ".//modules/vpc"
+  source   = ".//modules/vpc"
+  az_count = "2"
 }
 
 
